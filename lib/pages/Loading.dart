@@ -1,7 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert' as convert;
-import 'package:http/http.dart' as http;
+import 'package:world_time_app/services/world_time.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Loading extends StatefulWidget {
   const Loading({Key? key}) : super(key: key);
@@ -11,6 +10,8 @@ class Loading extends StatefulWidget {
 }
 
 class _LoadingState extends State<Loading> {
+  String time = 'loading';
+
   /* Future<void> getImageData() async {
     var response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/todos/1'));
     if (response.statusCode == 200) {
@@ -23,36 +24,41 @@ class _LoadingState extends State<Loading> {
     }
   }*/
 
-  getTimeData() async {
-    var response = await http.get(
-        Uri.parse('http://worldtimeapi.org/api/timezone/America/Los_Angeles'));
-    if (response.statusCode == 200) {
-      var jsonResponse =
-          convert.jsonDecode(response.body) as Map<String, dynamic>;
-      var utcOffset = jsonResponse['utc_offset'].toString().substring(1, 3);
-      var utcDatetime = jsonResponse['utc_datetime'];
-      DateTime now = DateTime.parse(utcDatetime);
-      now = now.add(Duration(hours: int.parse(utcOffset)));
-      print(
-          'Request success with status: ${utcOffset} - ${utcDatetime} -${now}.');
-    } else {
-      print('Request failed with status: ${response.statusCode}.');
-    }
+  void setupWorldTime() async {
+    WorldTime _worldTime = WorldTime(url: 'Europe/London', location: 'London', flag: 'uk.png');
+    await _worldTime.getTimeData();
+    print('_LoadingState ${_worldTime.time}');
+    /* setState(() {
+      time = _worldTime.time;
+    });*/
+    Navigator.pushReplacementNamed(context, '/home', arguments: {
+      'location': _worldTime.location,
+      'time': _worldTime.time,
+      'flag': _worldTime.flag,
+      'isDaytime' : _worldTime.isDayTime
+    });
   }
 
   @override
   void initState() {
     super.initState();
     // getImageData();
-    getTimeData();
+    setupWorldTime();
+
     print('_LoadingState choose Location init state');
   }
 
   @override
   Widget build(BuildContext context) {
     print('_LoadingState choose Location build');
-    return Scaffold(
-      body: Text('Loading Screen....'),
+    return const Scaffold(
+      backgroundColor: Colors.blue,
+      body: Center(
+        child: SpinKitFadingCube(
+          color: Colors.white,
+          size: 50.0,
+        ),
+      ),
     );
   }
 }

@@ -3,13 +3,8 @@ import 'package:world_time_app/pages/Home.dart';
 import 'package:world_time_app/pages/Loading.dart';
 import 'package:world_time_app/pages/Location.dart';
 
-void main() {
-  runApp(MaterialApp(
-    initialRoute: '/home',
-    routes: {
-      '/': (context) => Loading(),
-      '/home': (context) => Home(),
-      '/location': (context) => Location()
-    },
-  ));
-}
+void main() => runApp(MaterialApp(initialRoute: '/', routes: {
+      '/': (context) => const Loading(),
+      '/home': (context) => const Home(),
+      '/location': (context) => const Location(),
+    }));
